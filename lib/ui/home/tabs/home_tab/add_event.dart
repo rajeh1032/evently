@@ -1,3 +1,5 @@
+import 'package:evently/firebase_utils.dart';
+import 'package:evently/model/event.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_date_or_time.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_item.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_tab.dart';
@@ -7,6 +9,7 @@ import 'package:evently/ui/widget/custom_text_field.dart';
 import 'package:evently/utils/app_asset.dart';
 import 'package:evently/utils/app_colors.dart';
 import 'package:evently/utils/app_styles.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -26,9 +29,12 @@ class _AddEventState extends State<AddEvent> {
   String? formatedDate;
   var selectedTime;
   String? formatedTime;
+  late String selectedImage;
+  late String selectedEventName;
+
   var formKey = GlobalKey<FormState>();
   TextEditingController titleControler = TextEditingController();
-  TextEditingController descriptionControler = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +90,8 @@ class _AddEventState extends State<AddEvent> {
       AppAsset.holidayBG,
       AppAsset.eatingBG,
     ];
-    String selectedImage = eventImages[selected];
-    String selectedEventName = eventsList[selected]["name"];
+    selectedImage = eventImages[selected];
+    selectedEventName = eventsList[selected]["name"];
 
     return Scaffold(
       appBar: AppBar(
@@ -178,7 +184,7 @@ class _AddEventState extends State<AddEvent> {
                         maxLine: 4,
                         hintText:
                             AppLocalizations.of(context)!.event_description,
-                        controller: descriptionControler,
+                        controller: descriptionController,
                         validator: (text) {
                           if (text == null || text.isEmpty) {
                             return AppLocalizations.of(context)!
@@ -245,6 +251,19 @@ class _AddEventState extends State<AddEvent> {
   void addEvent() {
     if (formKey.currentState?.validate() == true) {
       //todo: add event to db
+      Event event = Event(
+          title: titleControler.text,
+          discription: descriptionController.text,
+          image: selectedImage,
+          eventName: selectedEventName,
+          dateTime: selectedDate,
+          time: formatedTime!);
+
+      FirebaseUtils.addEventToFireStore(event)
+          .timeout(Duration(milliseconds: 500), onTimeout: () {
+        return showDailog();
+        
+      });
     }
     if (selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -269,5 +288,29 @@ class _AddEventState extends State<AddEvent> {
     selectedTime = chooseTime;
     formatedTime = selectedTime!.format(context);
     setState(() {});
+  }
+
+  Future showDailog() {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Alert"),
+          content: Text("Event Added Successful"),
+          actions: [
+            TextButton(
+                onPressed: () {
+              Navigator.pop(context);
+                },
+                child: Text(
+                  "Ok",
+                  style: AppStyles.bold14Primary,
+                )),
+          ],
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        );
+      },
+    );
   }
 }

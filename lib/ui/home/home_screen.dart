@@ -27,11 +27,13 @@ class _HomeScreenState extends State<HomeScreen> {
             canvasColor: AppColors.transparentColor,
           ),
           child: BottomAppBar(
+            
             padding: EdgeInsets.zero,
             color: Theme.of(context).primaryColor,
             shape: const CircularNotchedRectangle(),
             child: BottomNavigationBar(
               currentIndex: selected,
+           
               onTap: (value) {
                 setState(() {
                   selected = value;

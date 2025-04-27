@@ -16,6 +16,7 @@ class AppTheme {
         backgroundColor: AppColors.primaryLight,
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          type: BottomNavigationBarType.fixed,
           elevation: 0,
           selectedLabelStyle: AppStyles.bold12White,
           unselectedLabelStyle: AppStyles.bold12White,
@@ -44,6 +45,7 @@ class AppTheme {
         backgroundColor: AppColors.primaryDark,
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          type: BottomNavigationBarType.fixed,
           elevation: 0,
           selectedLabelStyle: AppStyles.bold12White,
           unselectedLabelStyle: AppStyles.bold12White,
