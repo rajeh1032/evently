@@ -1,11 +1,13 @@
+import 'package:evently/model/event.dart';
 import 'package:evently/utils/app_asset.dart';
 import 'package:evently/utils/app_colors.dart';
 import 'package:evently/utils/app_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EventItem extends StatelessWidget {
-  const EventItem({super.key});
-
+  EventItem({super.key, required this.event});
+  Event event;
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -17,7 +19,7 @@ class EventItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.primaryLight, width: 1),
         image: DecorationImage(
-          image: AssetImage(AppAsset.sportBG),
+          image: AssetImage(event.image),
           fit: BoxFit.fill,
         ),
       ),
@@ -39,11 +41,11 @@ class EventItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "21",
+                  event.dateTime.day.toString(),
                   style: AppStyles.bold20Primary,
                 ),
                 Text(
-                  "Nov",
+                  DateFormat('MMM').format(event.dateTime),
                   style: AppStyles.bold16Primary,
                 ),
               ],
@@ -65,7 +67,7 @@ class EventItem extends StatelessWidget {
                   width: width * 0.018,
                 ),
                 Text(
-                  "This is Birthday Party",
+                  event.title,
                   style: AppStyles.medium16Black,
                 ),
                 Spacer(),

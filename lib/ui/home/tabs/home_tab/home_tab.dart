@@ -1,3 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:evently/firebase_utils.dart';
+import 'package:evently/model/event.dart';
+import 'package:evently/providers/event_provider.dart';
 import 'package:evently/providers/language_provider.dart';
 import 'package:evently/providers/theme_provider.dart';
 import 'package:evently/ui/home/tabs/home_tab/edit_even.dart';
@@ -21,6 +25,7 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> {
   int selected = 0;
+
   @override
   Widget build(BuildContext context) {
     var langaugeProvider = Provider.of<LanguageProvider>(context);
@@ -29,7 +34,7 @@ class _HomeTabState extends State<HomeTab> {
     final isDark = themeProvider.currentTheme == ThemeMode.dark;
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    List<Map<String, dynamic>> eventsList = [
+    List<Map<String, dynamic>> eventsNameIcon = [
       {
         "name": AppLocalizations.of(context)!.all,
         "icon": Bootstrap.list,
@@ -71,7 +76,10 @@ class _HomeTabState extends State<HomeTab> {
         "icon": Bootstrap.egg_fried,
       },
     ];
-
+    var eventListProvider = Provider.of<EventProvider>(context);
+    if (eventListProvider.eventList.isEmpty) {
+      eventListProvider.getAllEvent();
+    }
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context)!.primaryColor,
@@ -154,7 +162,7 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 Expanded(
                   child: DefaultTabController(
-                    length: eventsList.length,
+                    length: eventsNameIcon.length,
                     child: TabBar(
                       onTap: (index) {
                         setState(() {
@@ -166,7 +174,7 @@ class _HomeTabState extends State<HomeTab> {
                       indicatorColor: AppColors.transparentColor,
                       dividerColor: AppColors.transparentColor,
                       tabAlignment: TabAlignment.start,
-                      tabs: eventsList.asMap().entries.map(
+                      tabs: eventsNameIcon.asMap().entries.map(
                         (entry) {
                           int index = entry.key;
                           var event = entry.value;
@@ -189,18 +197,21 @@ class _HomeTabState extends State<HomeTab> {
           ),
           Expanded(
             child: ListView.separated(
+              padding: EdgeInsets.only(top: height * 0.01 ),
               separatorBuilder: (context, index) {
                 return SizedBox(
                   height: height * 0.013,
                 );
               },
-              itemCount: 20,
+              itemCount: eventListProvider.eventList.length,
               itemBuilder: (BuildContext context, int index) {
                 return InkWell(
                     onTap: () {
                       Navigator.pushNamed(context, EventDetails.routeName);
                     },
-                    child: EventItem());
+                    child: EventItem(
+                      event: eventListProvider.eventList[index],
+                    ));
               },
             ),
           ),

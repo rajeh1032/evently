@@ -43,7 +43,7 @@ class FavouraiteTab extends StatelessWidget {
             },
             itemCount: 20,
             itemBuilder: (BuildContext context, int index) {
-              return EventItem();
+              // return EventItem();
             },
           ),
         ),

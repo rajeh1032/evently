@@ -1,5 +1,6 @@
 import 'package:evently/firebase_utils.dart';
 import 'package:evently/model/event.dart';
+import 'package:evently/providers/event_provider.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_date_or_time.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_item.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_tab.dart';
@@ -9,11 +10,13 @@ import 'package:evently/ui/widget/custom_text_field.dart';
 import 'package:evently/utils/app_asset.dart';
 import 'package:evently/utils/app_colors.dart';
 import 'package:evently/utils/app_styles.dart';
+import 'package:evently/utils/toast_msg.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class AddEvent extends StatefulWidget {
   static const String routeName = '/addEvent';
@@ -35,9 +38,11 @@ class _AddEventState extends State<AddEvent> {
   var formKey = GlobalKey<FormState>();
   TextEditingController titleControler = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  late var eventProvider;
 
   @override
   Widget build(BuildContext context) {
+    eventProvider = Provider.of<EventProvider>(context);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     List<Map<String, dynamic>> eventsList = [
@@ -261,8 +266,15 @@ class _AddEventState extends State<AddEvent> {
 
       FirebaseUtils.addEventToFireStore(event)
           .timeout(Duration(milliseconds: 500), onTimeout: () {
-        return showDailog();
-        
+        ToastMsg.addToast(
+            message: "Event Added Successfully",
+            BGColor: AppColors.primaryLight,
+            textColor: AppColors.whiteColor);
+
+        eventProvider.getAllEvent();
+        Navigator.pop(
+          context,
+        );
       });
     }
     if (selectedTime == null) {
@@ -288,29 +300,5 @@ class _AddEventState extends State<AddEvent> {
     selectedTime = chooseTime;
     formatedTime = selectedTime!.format(context);
     setState(() {});
-  }
-
-  Future showDailog() {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Alert"),
-          content: Text("Event Added Successful"),
-          actions: [
-            TextButton(
-                onPressed: () {
-              Navigator.pop(context);
-                },
-                child: Text(
-                  "Ok",
-                  style: AppStyles.bold14Primary,
-                )),
-          ],
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        );
-      },
-    );
   }
 }

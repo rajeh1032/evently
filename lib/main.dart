@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently/firebase_options.dart';
+import 'package:evently/providers/event_provider.dart';
 import 'package:evently/providers/language_provider.dart';
 import 'package:evently/providers/theme_provider.dart';
 import 'package:evently/ui/home/home_screen.dart';
@@ -26,7 +27,8 @@ void main(List<String> args) async {
   await FirebaseFirestore.instance.disableNetwork();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => LanguageProvider()),
-    ChangeNotifierProvider(create: (context) => ThemeProvider())
+    ChangeNotifierProvider(create: (context) => ThemeProvider()),
+    ChangeNotifierProvider(create: (context)=>EventProvider())
   ], child: const MyApp()));
 }
 
