@@ -28,7 +28,7 @@ void main(List<String> args) async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => LanguageProvider()),
     ChangeNotifierProvider(create: (context) => ThemeProvider()),
-    ChangeNotifierProvider(create: (context)=>EventProvider())
+    ChangeNotifierProvider(create: (context) => EventProvider())
   ], child: const MyApp()));
 }
 

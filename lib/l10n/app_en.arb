@@ -66,5 +66,6 @@
   "reset_password": "Reset Password",
   "edit_event": "Edit Event",
   "update_event": "Update Event",
-  "event_details": "Event Details"
+  "event_details": "Event Details",
+  "no_event_added":" No Event Added"
 }

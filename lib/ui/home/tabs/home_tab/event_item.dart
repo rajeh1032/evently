@@ -1,9 +1,11 @@
 import 'package:evently/model/event.dart';
+import 'package:evently/providers/event_provider.dart';
 import 'package:evently/utils/app_asset.dart';
 import 'package:evently/utils/app_colors.dart';
 import 'package:evently/utils/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class EventItem extends StatelessWidget {
   EventItem({super.key, required this.event});
@@ -12,6 +14,7 @@ class EventItem extends StatelessWidget {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    var eventListProvider = Provider.of<EventProvider>(context);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: width * 0.030),
       height: height * 0.31,
@@ -40,13 +43,17 @@ class EventItem extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  event.dateTime.day.toString(),
-                  style: AppStyles.bold20Primary,
+                Expanded(
+                  child: Text(
+                    event.dateTime.day.toString(),
+                    style: AppStyles.bold20Primary,
+                  ),
                 ),
-                Text(
-                  DateFormat('MMM').format(event.dateTime),
-                  style: AppStyles.bold16Primary,
+                Expanded(
+                  child: Text(
+                    DateFormat('MMM').format(event.dateTime),
+                    style: AppStyles.bold16Primary,
+                  ),
                 ),
               ],
             ),
@@ -73,10 +80,12 @@ class EventItem extends StatelessWidget {
                 Spacer(),
                 IconButton(
                   onPressed: () {
-                    //todo add to favourite
+                    eventListProvider.updateIsFavorite(event);
                   },
                   icon: ImageIcon(
-                    AssetImage(AppAsset.heartIconUnSelcted),
+                    event.isFavorite == true
+                        ? AssetImage(AppAsset.heartIconSelcted)
+                        : AssetImage(AppAsset.heartIconUnSelcted),
                   ),
                   color: AppColors.primaryLight,
                 )

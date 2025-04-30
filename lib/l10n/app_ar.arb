@@ -66,5 +66,6 @@
   "reset_password": "إعادة تعيين كلمة المرور",
   "edit_event": "تعديل الحدث",
   "update_event": "تحديث الحدث",
-  "event_details": "تفاصيل الحدث"
+  "event_details": "تفاصيل الحدث",
+  "no_event_added": " لا توجد أحداث مضافة بعد"
 }
