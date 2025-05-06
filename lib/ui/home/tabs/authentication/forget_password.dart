@@ -1,16 +1,9 @@
-import 'package:evently/providers/language_provider.dart';
-import 'package:evently/ui/home/tabs/authentication/forget_password.dart';
-import 'package:evently/ui/home/tabs/authentication/login_screen.dart';
-import 'package:evently/ui/home/tabs/authentication/register_screen.dart';
-import 'package:evently/ui/onboarding/langauge_switch.dart';
 import 'package:evently/ui/widget/custom_elvated_button.dart';
-import 'package:evently/ui/widget/custom_text_field.dart';
 import 'package:evently/utils/app_asset.dart';
 import 'package:evently/utils/app_colors.dart';
 import 'package:evently/utils/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:provider/provider.dart';
 
 class ForgetPassword extends StatelessWidget {
   static const String routeName = '/forget_password';

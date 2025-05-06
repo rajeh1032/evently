@@ -67,5 +67,12 @@
   "edit_event": "Edit Event",
   "update_event": "Update Event",
   "event_details": "Event Details",
-  "no_event_added":" No Event Added"
+  "no_event_added":" No Event Added",
+  "please_enter_your_email": "Please enter your email",
+  "please_enter_valid_email": "Please enter valid email",
+  "please_enter_your_password": "Please enter your password",
+  "please_enter_your_name": "Please enter your name",
+  "please_enter_your_retype_password": "Please enter your retype password",
+  "password_is_too_short": "Password is too short",
+  "account_created_successfully":"account_created_successfully"
 }

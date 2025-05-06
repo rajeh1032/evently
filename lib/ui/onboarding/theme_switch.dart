@@ -13,7 +13,7 @@ class ThemeSwitch extends StatelessWidget {
     final isDark = themeProvider.currentTheme == ThemeMode.dark;
     return AnimatedToggleSwitch.rolling(
       current: isDark,
-      values: [false, true],
+      values: const [false, true],
       onChanged: (value) {
         themeProvider.changeTheme(value ? ThemeMode.dark : ThemeMode.light);
       },

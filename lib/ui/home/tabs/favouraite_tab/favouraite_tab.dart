@@ -1,4 +1,5 @@
 import 'package:evently/providers/event_provider.dart';
+import 'package:evently/providers/user_provider.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_item.dart';
 import 'package:evently/ui/widget/custom_text_field.dart';
 import 'package:evently/utils/app_asset.dart';
@@ -14,15 +15,24 @@ class FavouraiteTab extends StatefulWidget {
   @override
   State<FavouraiteTab> createState() => _FavouraiteTabState();
 }
-
 class _FavouraiteTabState extends State<FavouraiteTab> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      var eventListProvider = Provider.of<EventProvider>(context, listen: false);
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      eventListProvider.getAllIsFavorite(userProvider.user!.id); // نداء دائم
+    });
+  }
   @override
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     var eventListProvider = Provider.of<EventProvider>(context);
-    eventListProvider.getAllIsFavorite(); // نداء دائم
+    var userProvider = Provider.of<UserProvider>(context);
+  
     return Column(
       children: [
         SizedBox(
@@ -58,7 +68,7 @@ class _FavouraiteTabState extends State<FavouraiteTab> {
                       height: height * 0.013,
                     );
                   },
-                  itemBuilder: (BuildContext context, int index) {
+                  itemBuilder: (BuildContext context,  index) {
                     return EventItem(
                         event: eventListProvider.favoriteEventList[index]);
                   },

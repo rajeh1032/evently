@@ -14,7 +14,7 @@ class LangaugeSwitch extends StatelessWidget {
     final isEnglish = langaugeProvider.currentLanguage == "en";
     return AnimatedToggleSwitch.rolling(
       current: isEnglish,
-      values: [false, true],
+      values: const [false, true],
       onChanged: (value) {
         langaugeProvider.changeLangauge(value ? "en" : "ar");
       },

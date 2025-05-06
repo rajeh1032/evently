@@ -4,6 +4,7 @@ import 'package:evently/model/event.dart';
 import 'package:evently/providers/event_provider.dart';
 import 'package:evently/providers/language_provider.dart';
 import 'package:evently/providers/theme_provider.dart';
+import 'package:evently/providers/user_provider.dart';
 import 'package:evently/ui/home/tabs/home_tab/edit_even.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_details.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_item.dart';
@@ -26,6 +27,8 @@ class HomeTab extends StatefulWidget {
 class _HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
+
     var langaugeProvider = Provider.of<LanguageProvider>(context);
     final isEnglish = langaugeProvider.currentLanguage == "en";
     var themeProvider = Provider.of<ThemeProvider>(context);
@@ -35,61 +38,73 @@ class _HomeTabState extends State<HomeTab> {
 
     var eventListProvider = Provider.of<EventProvider>(context);
     if (eventListProvider.filterList.isEmpty) {
-      eventListProvider.getAllEventFilter();
+      eventListProvider.getAllEventFilter(context, userProvider.user!.id);
     }
     eventListProvider.geteventsNameIcon(context);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context)!.primaryColor,
+        backgroundColor: Theme.of(context).primaryColor,
         title: Row(
+          mainAxisAlignment: MainAxisAlignment
+              .spaceBetween, // Changed from start to spaceBetween
           children: [
-            Column(
+            Expanded(
+              // Wrap the title in Expanded to control its alignment
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment
+                    .start, // This ensures text aligns to the start
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.welcome_back,
+                    style: AppStyles.medium16White,
+                  ),
+                  Text(
+                    userProvider.user!.name,
+                    style: AppStyles.bold20White,
+                  ),
+                ],
+              ),
+            ),
+            // No need for Spacer() when using MainAxisAlignment.spaceBetween
+            Row(
+              // Group the icons in their own Row
               children: [
-                Text(
-                  AppLocalizations.of(context)!.welcome_back,
-                  style: AppStyles.medium16White,
+                IconButton(
+                  onPressed: () {
+                    // Change theme
+                    isDark
+                        ? themeProvider.changeTheme(ThemeMode.light)
+                        : themeProvider.changeTheme(ThemeMode.dark);
+                  },
+                  icon: ImageIcon(
+                    AssetImage(
+                      AppAsset.sunIcon,
+                    ),
+                    color: AppColors.whiteColor,
+                  ),
                 ),
-                Text(
-                  "Ahmed Rajeh",
-                  style: AppStyles.bold20White,
+                InkWell(
+                  onTap: () {
+                    // Change Language
+                    isEnglish
+                        ? langaugeProvider.changeLangauge("ar")
+                        : langaugeProvider.changeLangauge("en");
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: AppColors.whiteColor,
+                    ),
+                    child: Text(isEnglish ? "عربي" : "EN",
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold)),
+                  ),
                 ),
               ],
             ),
-            Spacer(),
-            IconButton(
-              onPressed: () {
-                //todo change theme
-                isDark
-                    ? themeProvider.changeTheme(ThemeMode.light)
-                    : themeProvider.changeTheme(ThemeMode.dark);
-              },
-              icon: ImageIcon(
-                AssetImage(
-                  AppAsset.sunIcon,
-                ),
-                color: AppColors.whiteColor,
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                //todo change Langauge
-                isEnglish
-                    ? langaugeProvider.changeLangauge("ar")
-                    : langaugeProvider.changeLangauge("en");
-              },
-              child: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: AppColors.whiteColor,
-                ),
-                child: Text(isEnglish ? "عربي" : "EN",
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold)),
-              ),
-            )
           ],
         ),
       ),
@@ -124,7 +139,8 @@ class _HomeTabState extends State<HomeTab> {
                     child: TabBar(
                       onTap: (index) {
                         setState(() {
-                          eventListProvider.changeSelectdIndex(index);
+                          eventListProvider.changeSelectdIndex(
+                              index, userProvider.user!.id, context);
                         });
                       },
                       isScrollable: true,
@@ -176,8 +192,8 @@ class _HomeTabState extends State<HomeTab> {
                     itemBuilder: (context, index) {
                       return InkWell(
                           onTap: () {
-                            Navigator.pushNamed(
-                                context, EventDetails.routeName);
+                            Navigator.pushNamed(context, EventDetails.routeName,
+                                arguments: eventListProvider.filterList[index]);
                           },
                           child: EventItem(
                             event: eventListProvider.filterList[index],

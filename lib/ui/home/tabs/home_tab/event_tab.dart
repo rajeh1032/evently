@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class EventTab extends StatelessWidget {
   EventTab(
-      {required this.eventName,
+      {super.key, required this.eventName,
       required this.eventIcon,
       required this.isSelected,
       required this.selectedBackgroundColor,
@@ -26,7 +26,7 @@ class EventTab extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(8),
       padding: const EdgeInsets.all(8),
-      height: height * 0.0475,
+      height: height * 0.08,
       decoration: BoxDecoration(
           color:
               isSelected ? selectedBackgroundColor : AppColors.transparentColor,

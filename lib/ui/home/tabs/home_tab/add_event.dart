@@ -1,6 +1,7 @@
 import 'package:evently/firebase_utils.dart';
 import 'package:evently/model/event.dart';
 import 'package:evently/providers/event_provider.dart';
+import 'package:evently/providers/user_provider.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_date_or_time.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_item.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_tab.dart';
@@ -20,7 +21,7 @@ import 'package:provider/provider.dart';
 
 class AddEvent extends StatefulWidget {
   static const String routeName = '/addEvent';
-  AddEvent({super.key});
+  const AddEvent({super.key});
 
   @override
   State<AddEvent> createState() => _AddEventState();
@@ -97,7 +98,7 @@ class _AddEventState extends State<AddEvent> {
     ];
     selectedImage = eventImages[selected];
     selectedEventName = eventsList[selected]["name"];
-
+    var userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -173,6 +174,7 @@ class _AddEventState extends State<AddEvent> {
                             return AppLocalizations.of(context)!
                                 .please_enter_event_title;
                           }
+                          return null;
                         },
                       ),
                       /*################################################################################# */
@@ -195,6 +197,7 @@ class _AddEventState extends State<AddEvent> {
                             return AppLocalizations.of(context)!
                                 .please_enter_event_description;
                           }
+                          return null;
                         },
                       ),
                       /*################################################################################# */
@@ -263,15 +266,28 @@ class _AddEventState extends State<AddEvent> {
           eventName: selectedEventName,
           dateTime: selectedDate,
           time: formatedTime!);
-
-      FirebaseUtils.addEventToFireStore(event)
-          .timeout(Duration(milliseconds: 500), onTimeout: () {
+      //todo: userProvider
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      //todo: eventProvider
+      FirebaseUtils.addEventToFireStore(event, userProvider.user!.id)
+          .then((value) {
         ToastMsg.addToast(
             message: "Event Added Successfully",
             BGColor: AppColors.primaryLight,
             textColor: AppColors.whiteColor);
 
-        eventProvider.getAllEvent();
+        eventProvider.getAllEvent(userProvider.user!.id);
+        Navigator.pop(
+          context,
+        );
+      }).timeout(const Duration(milliseconds: 500), onTimeout: () {
+        //todo:add alert dialog
+        ToastMsg.addToast(
+            message: "Event Added Successfully",
+            BGColor: AppColors.primaryLight,
+            textColor: AppColors.whiteColor);
+        print("event added successfully");
+        eventProvider.getAllEvent(userProvider.user!.id);
         Navigator.pop(
           context,
         );

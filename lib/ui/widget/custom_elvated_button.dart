@@ -9,7 +9,7 @@ class CustomElvatedButton extends StatelessWidget {
   String text;
 
   CustomElvatedButton(
-      {required this.backgroundColor,
+      {super.key, required this.backgroundColor,
       required this.onPressed,
       required this.text});
 

@@ -9,7 +9,7 @@ class EventDateOrTime extends StatelessWidget {
 
   VoidCallback onChoosedDateOrTime;
 
-  EventDateOrTime({
+  EventDateOrTime({super.key, 
     required this.IconImage,
     required this.eventText,
     required this.onChoosedDateOrTime,
@@ -31,7 +31,7 @@ class EventDateOrTime extends StatelessWidget {
           style: AppStyles.bold16Grey
               .copyWith(color: Theme.of(context).hoverColor),
         ),
-        Spacer(),
+        const Spacer(),
         TextButton(
             onPressed: () {
               onChoosedDateOrTime();

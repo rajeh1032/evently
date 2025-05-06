@@ -67,7 +67,7 @@ class HomeOnboardingScreen extends StatelessWidget {
                     AppLocalizations.of(context)!.language,
                     style: AppStyles.bold20Primary,
                   ),
-                  LangaugeSwitch(),
+                  const LangaugeSwitch(),
                 ],
               ),
               SizedBox(
@@ -80,7 +80,7 @@ class HomeOnboardingScreen extends StatelessWidget {
                     AppLocalizations.of(context)!.theme,
                     style: AppStyles.bold20Primary,
                   ),
-                  ThemeSwitch(),
+                  const ThemeSwitch(),
                 ],
               ),
               SizedBox(

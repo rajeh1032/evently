@@ -28,7 +28,7 @@ class Event {
           eventName: data['event_name'],
           dateTime: DateTime.fromMillisecondsSinceEpoch(data['date_time']),
           time: data['time'],
-          isFavorite: data['is_favorrite'],
+          isFavorite: data['is_favorite'] ?? data['is_favorite'] ?? false,
         );
   //todo from object to json
   Map<String, dynamic> toFireStore() {
@@ -40,7 +40,7 @@ class Event {
       'event_name': eventName,
       'date_time': dateTime.millisecondsSinceEpoch,
       'time': time,
-      'is_favorrite': isFavorite
+      'is_favorite': isFavorite
     };
   }
 }

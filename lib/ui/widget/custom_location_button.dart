@@ -9,7 +9,7 @@ class CustomLocationButton extends StatelessWidget {
   String leadingIconImage;
   bool? suffixIcon;
   VoidCallback? onTap;
-  CustomLocationButton({
+  CustomLocationButton({super.key, 
     required this.firstText,
     this.secondText,
     required this.leadingIconImage,
@@ -67,7 +67,7 @@ class CustomLocationButton extends StatelessWidget {
             ),
             const Spacer(),
             suffixIcon == true
-                ? Icon(
+                ? const Icon(
                     Icons.arrow_right,
                     color: AppColors.primaryLight,
                     size: 40,

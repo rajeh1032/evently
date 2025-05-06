@@ -1,5 +1,9 @@
+import 'package:evently/model/event.dart';
+import 'package:evently/providers/event_provider.dart';
+import 'package:evently/providers/user_provider.dart';
 import 'package:evently/ui/home/tabs/home_tab/edit_even.dart';
 import 'package:evently/ui/widget/custom_location_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_date_or_time.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_item.dart';
@@ -13,15 +17,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class EventDetails extends StatelessWidget {
   static const routeName = '/event_details';
-  const EventDetails({super.key});
+  EventDetails({super.key});
 
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    Event event = ModalRoute.of(context)!.settings.arguments as Event;
+    var eventProvider = Provider.of<EventProvider>(context);
+    var userProvider = Provider.of<UserProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -34,12 +43,52 @@ class EventDetails extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, EditEven.routeName);
               },
-              icon: ImageIcon(AssetImage(AppAsset.pinIcon),
+              icon: const ImageIcon(AssetImage(AppAsset.pinIcon),
                   color: AppColors.primaryLight)),
           IconButton(
-              onPressed: () {
-                //todo : add delete event function
-              },
+              onPressed: () async {
+    // Show confirmation dialog
+    bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("delete_event"),
+        content: Text("delete_event_confirmation"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text("cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+           "delete",
+              style: const TextStyle(color: AppColors.redColor),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm ?? false) {
+      try {
+        final eventProvider = Provider.of<EventProvider>(context, listen: false);
+        await eventProvider.deleteEvent(eventId:   event.id,uId: userProvider.user!.id);
+        Navigator.pop(context); // Return to previous screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("event_deleted_successfully"),
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("error_deleting_event"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  },
               icon: const ImageIcon(AssetImage(AppAsset.recycleIcon),
                   color: AppColors.redColor)),
         ],
@@ -56,7 +105,7 @@ class EventDetails extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
-                  AppAsset.sportBG,
+                  event.image,
                   fit: BoxFit.cover,
                   height: height * 0.25,
                   width: width,
@@ -65,14 +114,13 @@ class EventDetails extends StatelessWidget {
               SizedBox(
                 height: height * 0.02,
               ),
-              Text("We Are Going To Play Football",
-                  style: AppStyles.medium20Primary),
+              Text(event.title, style: AppStyles.medium20Primary),
               SizedBox(
                 height: height * 0.02,
               ),
               CustomLocationButton(
-                firstText: "21 November 2024 ",
-                secondText: "12:12PM",
+                firstText: DateFormat('dd/MMM/yyyy').format(event.dateTime),
+                secondText: event.time,
                 leadingIconImage: AppAsset.calenderIcon,
               ),
               SizedBox(
@@ -103,7 +151,7 @@ class EventDetails extends StatelessWidget {
                 height: height * 0.01,
               ),
               Text(
-                "Lorem ipsum dolor sit amet consectetur. Vulputate eleifend suscipit eget neque senectus a. Nulla at non malesuada odio duis lectus amet nisi sit. Risus hac enim maecenas auctor et. At cras massa diam porta facilisi lacus purus. Iaculis eget quis ut amet. Sit ac malesuada nisi quis  feugiat.",
+                event.discription,
                 style: AppStyles.medium16Black,
               ),
               SizedBox(

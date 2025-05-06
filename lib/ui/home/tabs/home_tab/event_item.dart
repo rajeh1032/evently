@@ -1,5 +1,6 @@
 import 'package:evently/model/event.dart';
 import 'package:evently/providers/event_provider.dart';
+import 'package:evently/providers/user_provider.dart';
 import 'package:evently/utils/app_asset.dart';
 import 'package:evently/utils/app_colors.dart';
 import 'package:evently/utils/app_styles.dart';
@@ -7,11 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class EventItem extends StatelessWidget {
+class EventItem extends StatefulWidget {
   EventItem({super.key, required this.event});
   Event event;
+
+  @override
+  State<EventItem> createState() => _EventItemState();
+}
+
+class _EventItemState extends State<EventItem> {
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     var eventListProvider = Provider.of<EventProvider>(context);
@@ -22,7 +30,7 @@ class EventItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.primaryLight, width: 1),
         image: DecorationImage(
-          image: AssetImage(event.image),
+          image: AssetImage(widget.event.image),
           fit: BoxFit.fill,
         ),
       ),
@@ -45,13 +53,13 @@ class EventItem extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    event.dateTime.day.toString(),
+                    widget.event.dateTime.day.toString(),
                     style: AppStyles.bold20Primary,
                   ),
                 ),
                 Expanded(
                   child: Text(
-                    DateFormat('MMM').format(event.dateTime),
+                    DateFormat('MMM').format(widget.event.dateTime),
                     style: AppStyles.bold16Primary,
                   ),
                 ),
@@ -74,20 +82,24 @@ class EventItem extends StatelessWidget {
                   width: width * 0.018,
                 ),
                 Text(
-                  event.title,
+                  widget.event.title,
                   style: AppStyles.medium16Black,
                 ),
                 Spacer(),
                 IconButton(
                   onPressed: () {
-                    eventListProvider.updateIsFavorite(event);
+                    setState(() {
+                      eventListProvider.updateIsFavorite(
+                          widget.event, userProvider.user!.id, context);
+                    });
                   },
                   icon: ImageIcon(
-                    event.isFavorite == true
+                    widget.event.isFavorite == true
                         ? AssetImage(AppAsset.heartIconSelcted)
                         : AssetImage(AppAsset.heartIconUnSelcted),
                   ),
                   color: AppColors.primaryLight,
+                  iconSize: 35,
                 )
               ],
             ),

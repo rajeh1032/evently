@@ -67,5 +67,13 @@
   "edit_event": "تعديل الحدث",
   "update_event": "تحديث الحدث",
   "event_details": "تفاصيل الحدث",
-  "no_event_added": " لا توجد أحداث مضافة بعد"
+  "no_event_added": " لا توجد أحداث مضافة بعد",
+  "please_enter_your_email": "يرجى إدخال بريدك الإلكتروني",
+  "please_enter_valid_email": "يرجى إدخال بريد الإلكتروني صحيح",
+  "please_enter_your_password": "يرجى إدخال كلمة المرور",
+  "please_enter_your_name": "يرجى إدخال اسمك",
+  "please_enter_your_retype_password": "يرجى إدخال إعادة كتابة كلمة المرور",
+  "password_is_too_short": "كلمة المرور قصيرة جدا",
+    "account_created_successfully":"تم انشاء الحساب بنجاح"
+
 }

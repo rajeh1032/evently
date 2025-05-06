@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static final ThemeData lightTheme = ThemeData(
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
           color: AppColors.whiteColor,
           iconTheme: IconThemeData(color: AppColors.primaryLight)),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -33,12 +33,12 @@ class AppTheme {
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
   static final ThemeData darkTheme = ThemeData(
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
           color: AppColors.primaryDark,
           iconTheme: IconThemeData(color: AppColors.primaryLight)),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         shape: StadiumBorder(
-            side: const BorderSide(
+            side: BorderSide(
           color: AppColors.whiteColor,
           width: 4,
         )),

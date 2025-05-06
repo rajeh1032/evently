@@ -14,7 +14,7 @@ import 'package:intl/intl.dart';
 
 class EditEven extends StatefulWidget {
   static const String routeName = '/editEvent';
-  EditEven({super.key});
+  const EditEven({super.key});
 
   @override
   State<EditEven> createState() => _EditEventState();
@@ -162,6 +162,7 @@ class _EditEventState extends State<EditEven> {
                             return AppLocalizations.of(context)!
                                 .please_enter_event_title;
                           }
+                          return null;
                         },
                       ),
                       /*################################################################################# */
@@ -184,6 +185,7 @@ class _EditEventState extends State<EditEven> {
                             return AppLocalizations.of(context)!
                                 .please_enter_event_description;
                           }
+                          return null;
                         },
                       ),
                       /*################################################################################# */

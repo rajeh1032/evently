@@ -1,10 +1,13 @@
 import 'package:evently/providers/language_provider.dart';
 import 'package:evently/providers/theme_provider.dart';
+import 'package:evently/providers/user_provider.dart';
+import 'package:evently/ui/home/tabs/authentication/login_screen.dart';
 import 'package:evently/ui/home/tabs/profile_tab/languge_bottom_sheet%20copy.dart';
 import 'package:evently/ui/home/tabs/profile_tab/theme_bottom_sheet.dart';
 import 'package:evently/utils/app_asset.dart';
 import 'package:evently/utils/app_colors.dart';
 import 'package:evently/utils/app_styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +17,7 @@ class ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
     var languageProvider = Provider.of<LanguageProvider>(context);
     var themeProvider = Provider.of<ThemeProvider>(context);
     var height = MediaQuery.of(context).size.height;
@@ -37,12 +41,12 @@ class ProfileTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Ahmed Rajeh", style: AppStyles.bold20White),
+                    Text(userProvider.user!.name, style: AppStyles.bold20White),
                     SizedBox(
                       height: height * 0.005,
                     ),
                     Text(
-                      "ahmed@gmail.com",
+                      userProvider.user!.email,
                       style: AppStyles.bold16White,
                       maxLines: 2,
                     ),
@@ -136,6 +140,9 @@ class ProfileTab extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   //todo Logout
+                  FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacementNamed(
+                      context, LoginScreen.routeName);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.redColor,

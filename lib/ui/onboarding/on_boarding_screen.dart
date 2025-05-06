@@ -13,6 +13,8 @@ import 'package:provider/provider.dart';
 class OnBoardingScreen extends StatelessWidget {
   static const String routeName = "on_boarding_screen";
 
+  const OnBoardingScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;

@@ -55,7 +55,7 @@ class _LangugeBottomSheetState extends State<LangugeBottomSheet> {
               .headlineLarge
               ?.copyWith(color: AppColors.primaryLight),
         ),
-        Icon(
+        const Icon(
           Icons.check,
           size: 35,
           color: AppColors.primaryLight,
