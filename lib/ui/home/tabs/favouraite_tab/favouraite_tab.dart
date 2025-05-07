@@ -1,4 +1,5 @@
 import 'package:evently/model/event.dart';
+import 'package:evently/providers/current_event.dart';
 import 'package:evently/providers/event_provider.dart';
 import 'package:evently/providers/user_provider.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_details.dart';
@@ -25,7 +26,6 @@ class _FavouraiteTabState extends State<FavouraiteTab> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final eventProvider = Provider.of<EventProvider>(context, listen: false);
 
-    /// تأكد من تحميل بيانات المفضلة أولًا
     if (eventProvider.favoriteEventList.isEmpty) {
       setState(() {
         filterFavoiriteEvent = eventProvider.favoriteEventList;
@@ -41,11 +41,8 @@ class _FavouraiteTabState extends State<FavouraiteTab> {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     var userProvider = Provider.of<UserProvider>(context);
-    // eventListProvider.getAllEvent(userProvider.user!.id);
+    var currentEventProvider = Provider.of<CurrentEvent>(context);
 
-    // if (eventListProvider.favoriteEventList.isEmpty) {
-    //   eventListProvider.getAllIsFavorite(userProvider.user!.id);
-    // }
     return Column(
       children: [
         SizedBox(
@@ -95,6 +92,8 @@ class _FavouraiteTabState extends State<FavouraiteTab> {
                           EventDetails.routeName,
                           arguments: filterFavoiriteEvent[index],
                         );
+                        currentEventProvider
+                            .setCurrentEvent(filterFavoiriteEvent[index]);
                       },
                       child: EventItem(
                         event: filterFavoiriteEvent[index],
