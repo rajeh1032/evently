@@ -1,3 +1,7 @@
+import 'package:evently/model/event.dart';
+import 'package:evently/providers/current_event.dart';
+import 'package:evently/providers/event_provider.dart';
+import 'package:evently/providers/user_provider.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_date_or_time.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_item.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_tab.dart';
@@ -11,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class EditEven extends StatefulWidget {
   static const String routeName = '/editEvent';
@@ -21,6 +26,28 @@ class EditEven extends StatefulWidget {
 }
 
 class _EditEventState extends State<EditEven> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      var currentEventProvider =
+          Provider.of<CurrentEvent>(context, listen: false);
+
+      var event = currentEventProvider.currentEvent;
+
+      setState(() {
+        titleControler.text = event!.title;
+        descriptionControler.text = event.discription;
+        selectedDate = event.dateTime;
+        formatedDate = DateFormat('dd/MM/yyyy').format(event.dateTime);
+        formatedTime = event.time;
+        selected = eventsList
+            .indexWhere((element) => element["name"] == event.eventName);
+      });
+    });
+  }
+
+  late List<Map<String, dynamic>> eventsList;
   int selected = 0;
   var selectedDate;
   String? formatedDate;
@@ -29,12 +56,22 @@ class _EditEventState extends State<EditEven> {
   var formKey = GlobalKey<FormState>();
   TextEditingController titleControler = TextEditingController();
   TextEditingController descriptionControler = TextEditingController();
-
+  List<String> eventImages = [
+    AppAsset.sportBG,
+    AppAsset.birthdayBG,
+    AppAsset.meetingBG,
+    AppAsset.gamingBG,
+    AppAsset.work_shopBG,
+    AppAsset.book_clubBG,
+    AppAsset.exhibition_imageBG,
+    AppAsset.holidayBG,
+    AppAsset.eatingBG,
+  ];
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    List<Map<String, dynamic>> eventsList = [
+    eventsList = [
       {
         "name": AppLocalizations.of(context)!.sport,
         "icon": Bootstrap.balloon,
@@ -73,20 +110,16 @@ class _EditEventState extends State<EditEven> {
       },
     ];
 
-    List<String> eventImages = [
-      AppAsset.sportBG,
-      AppAsset.birthdayBG,
-      AppAsset.meetingBG,
-      AppAsset.gamingBG,
-      AppAsset.work_shopBG,
-      AppAsset.book_clubBG,
-      AppAsset.exhibition_imageBG,
-      AppAsset.holidayBG,
-      AppAsset.eatingBG,
-    ];
     String selectedImage = eventImages[selected];
     String selectedEventName = eventsList[selected]["name"];
+    var eventProvider = Provider.of<EventProvider>(context);
 
+    var userProvider = Provider.of<UserProvider>(context);
+    if (userProvider.user == null) {
+      return const Center(
+        child: Text('Please login to view events'),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -232,7 +265,7 @@ class _EditEventState extends State<EditEven> {
                       /*######################################################################################################## */
                       CustomElvatedButton(
                           backgroundColor: AppColors.primaryLight,
-                          onPressed: addEvent,
+                          onPressed: updateEvent,
                           text: AppLocalizations.of(context)!.update_event),
                       SizedBox(height: height * 0.02),
                     ],
@@ -244,9 +277,34 @@ class _EditEventState extends State<EditEven> {
     );
   }
 
-  void addEvent() {
+  void updateEvent() async {
     if (formKey.currentState?.validate() == true) {
-      //todo: add event to db
+      //todo: update event
+      try {
+        var currentEventProvider =
+            Provider.of<CurrentEvent>(context, listen: false);
+        var event = currentEventProvider.currentEvent;
+        var userProvider = Provider.of<UserProvider>(context, listen: false);
+        var eventProvider = Provider.of<EventProvider>(context, listen: false);
+        Event upDateEvent = Event(
+            id: event!.id,
+            title: titleControler.text,
+            discription: descriptionControler.text,
+            image: eventImages[selected],
+            eventName: eventsList[selected]['name'],
+            dateTime: selectedDate,
+            time: formatedTime!,
+            isFavorite: event.isFavorite);
+        await eventProvider.updateEvent(upDateEvent, userProvider.user!.id);
+
+        if (context.mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Event Update Successfuly")));
+        }
+      } catch (e) {
+        print("error is $e");
+      }
     }
     if (selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

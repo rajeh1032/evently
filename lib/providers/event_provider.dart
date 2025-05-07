@@ -10,12 +10,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class EventProvider extends ChangeNotifier {
   List<Event> eventList = [];
   List<Event> filterList = [];
-  List<Event> favoriteEventList = [];
+  var favoriteEventList = [];
   List<Map<String, dynamic>> eventsNameIcon = [];
 
   int selectedIndex = 0;
 
-//todo get event list withowt filter
+//todo get event list without filter
 
   void getAllEvent(String uId) async {
     QuerySnapshot<Event> querySnapshot =
@@ -27,7 +27,7 @@ class EventProvider extends ChangeNotifier {
     }).toList();
     filterList = eventList;
 
-//todo sortung list
+//todo sorting list
     filterList.sort((Event event1, Event event2) {
       return event1.dateTime.compareTo(event2.dateTime);
     });
@@ -53,24 +53,24 @@ class EventProvider extends ChangeNotifier {
 
   //todo update isFavorite
   void updateIsFavorite(Event event, String uId, BuildContext context) async {
-    FirebaseUtils.getEventCollection(uId)
+    await FirebaseUtils.getEventCollection(uId)
         .doc(event.id)
-        .update({'is_favorite': !event.isFavorite}).timeout(
-            const Duration(milliseconds: 200), onTimeout: () {
+        .update({'is_favorite': !event.isFavorite}).then((_) {
       ToastMsg.addToast(
-          message: "Favorite Update Successfull",
-          BGColor: AppColors.primaryLight,
-          textColor: AppColors.whiteColor);
+        message: "Favorite Update Successful",
+        BGColor: AppColors.primaryLight,
+        textColor: AppColors.whiteColor,
+      );
     });
+    getAllIsFavorite(uId);
     selectedIndex == 0 ? getAllEvent(uId) : getAllEventFilter(context, uId);
-    notifyListeners();
   }
 
   //todo get Favorite ordering
   void getAllIsFavorite(String uId) async {
     var querySnapShot = await FirebaseUtils.getEventCollection(uId)
         .where('is_favorite', isEqualTo: true)
-        .orderBy('date_time')
+        // .orderBy('date_time')
         .get();
 
     favoriteEventList = querySnapShot.docs.map((doc) {
@@ -86,11 +86,41 @@ class EventProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteEvent({required String eventId,required String uId}) async {
-    await FirebaseUtils.getEventCollection(uId).doc().delete();
-    eventList.removeWhere((event) => event.id == eventId);
-    favoriteEventList.removeWhere((event) => event.id == eventId);
-    notifyListeners();
+  Future<void> deleteEvent(
+      {required String eventId, required String uId}) async {
+    try {
+      await FirebaseUtils.getEventCollection(uId).doc(eventId).delete();
+
+      eventList.removeWhere((event) => event.id == eventId);
+      filterList.removeWhere((event) => event.id == eventId);
+      favoriteEventList.removeWhere((event) => event.id == eventId);
+
+      notifyListeners();
+      await Future.delayed(const Duration(milliseconds: 300));
+    } catch (e) {
+      print('Error deleting event: $e');
+      throw e;
+    }
+  }
+
+  Future<void> updateEvent(Event event, String Uid) async {
+    try {
+      await FirebaseUtils.getEventCollection(Uid)
+          .doc(event.id)
+          .update(event.toFireStore());
+      int eventIndex = eventList.indexWhere((e) => e.id == event.id);
+      if (eventIndex != -1) {
+        eventList[eventIndex] = event;
+      }
+      int favoriteIndex = favoriteEventList.indexWhere((e) => e.id == event.id);
+      if (favoriteIndex != -1) {
+        favoriteEventList[favoriteIndex] = event;
+      }
+      notifyListeners();
+    } catch (e) {
+      print("error is $e");
+      throw e;
+    }
   }
 
   List<Map<String, dynamic>> geteventsNameIcon(BuildContext context) {

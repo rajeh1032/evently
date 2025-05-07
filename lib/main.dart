@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently/firebase_options.dart';
+import 'package:evently/providers/current_event.dart';
 import 'package:evently/providers/event_provider.dart';
 import 'package:evently/providers/language_provider.dart';
 import 'package:evently/providers/theme_provider.dart';
@@ -30,7 +31,9 @@ void main(List<String> args) async {
     ChangeNotifierProvider(create: (context) => LanguageProvider()),
     ChangeNotifierProvider(create: (context) => ThemeProvider()),
     ChangeNotifierProvider(create: (context) => UserProvider()),
-    ChangeNotifierProvider(create: (context) => EventProvider())
+    ChangeNotifierProvider(create: (context) => EventProvider()),
+    ChangeNotifierProvider(create: (context) => CurrentEvent()),
+    
   ], child: const MyApp()));
 }
 

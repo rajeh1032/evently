@@ -1,4 +1,5 @@
 import 'package:evently/model/event.dart';
+import 'package:evently/providers/current_event.dart';
 import 'package:evently/providers/event_provider.dart';
 import 'package:evently/providers/user_provider.dart';
 import 'package:evently/ui/home/tabs/home_tab/edit_even.dart';
@@ -27,10 +28,17 @@ class EventDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    Event event = ModalRoute.of(context)!.settings.arguments as Event;
+
     var eventProvider = Provider.of<EventProvider>(context);
     var userProvider = Provider.of<UserProvider>(context);
 
+    if (userProvider.user == null) {
+      return const Center(
+        child: Text('Please login to view events'),
+      );
+    }
+    var currentEventProvider = Provider.of<CurrentEvent>(context);
+    var event = currentEventProvider.currentEvent;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -39,56 +47,30 @@ class EventDetails extends StatelessWidget {
           style: AppStyles.medium20Primary,
         ),
         actions: [
+          ///todo: edit button
           IconButton(
               onPressed: () {
                 Navigator.pushNamed(context, EditEven.routeName);
               },
               icon: const ImageIcon(AssetImage(AppAsset.pinIcon),
                   color: AppColors.primaryLight)),
+
+          ///todo: delete button
           IconButton(
               onPressed: () async {
-    // Show confirmation dialog
-    bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("delete_event"),
-        content: Text("delete_event_confirmation"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text("cancel"),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(
-           "delete",
-              style: const TextStyle(color: AppColors.redColor),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm ?? false) {
-      try {
-        final eventProvider = Provider.of<EventProvider>(context, listen: false);
-        await eventProvider.deleteEvent(eventId:   event.id,uId: userProvider.user!.id);
-        Navigator.pop(context); // Return to previous screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("event_deleted_successfully"),
-          ),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("error_deleting_event"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  },
+                try {
+                  await eventProvider.deleteEvent(
+                      eventId: event!.id, uId: userProvider.user!.id);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(e.toString())));
+                  }
+                }
+              },
               icon: const ImageIcon(AssetImage(AppAsset.recycleIcon),
                   color: AppColors.redColor)),
         ],
@@ -105,7 +87,7 @@ class EventDetails extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
-                  event.image,
+                  event!.image,
                   fit: BoxFit.cover,
                   height: height * 0.25,
                   width: width,
@@ -114,7 +96,7 @@ class EventDetails extends StatelessWidget {
               SizedBox(
                 height: height * 0.02,
               ),
-              Text(event.title, style: AppStyles.medium20Primary),
+              Text(event!.title, style: AppStyles.medium20Primary),
               SizedBox(
                 height: height * 0.02,
               ),

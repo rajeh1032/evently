@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evently/firebase_utils.dart';
 import 'package:evently/model/event.dart';
+import 'package:evently/providers/current_event.dart';
 import 'package:evently/providers/event_provider.dart';
 import 'package:evently/providers/language_provider.dart';
 import 'package:evently/providers/theme_provider.dart';
@@ -41,6 +42,7 @@ class _HomeTabState extends State<HomeTab> {
       eventListProvider.getAllEventFilter(context, userProvider.user!.id);
     }
     eventListProvider.geteventsNameIcon(context);
+    var currentEventProvider = Provider.of<CurrentEvent>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
@@ -192,8 +194,10 @@ class _HomeTabState extends State<HomeTab> {
                     itemBuilder: (context, index) {
                       return InkWell(
                           onTap: () {
-                            Navigator.pushNamed(context, EventDetails.routeName,
-                                arguments: eventListProvider.filterList[index]);
+                            Navigator.pushNamed(
+                                context, EventDetails.routeName);
+                            currentEventProvider.setCurrentEvent(
+                                eventListProvider.filterList[index]);
                           },
                           child: EventItem(
                             event: eventListProvider.filterList[index],
