@@ -22,18 +22,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
             canvasColor: AppColors.transparentColor,
           ),
           child: BottomAppBar(
-            
             padding: EdgeInsets.zero,
             color: Theme.of(context).primaryColor,
             shape: const CircularNotchedRectangle(),
             child: BottomNavigationBar(
               currentIndex: selected,
-           
+
               onTap: (value) {
                 setState(() {
                   selected = value;

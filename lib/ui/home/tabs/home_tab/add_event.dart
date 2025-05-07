@@ -256,47 +256,44 @@ class _AddEventState extends State<AddEvent> {
     );
   }
 
-  void addEvent() {
-    if (formKey.currentState?.validate() == true) {
-      //todo: add event to db
-      Event event = Event(
-          title: titleControler.text,
-          discription: descriptionController.text,
-          image: selectedImage,
-          eventName: selectedEventName,
-          dateTime: selectedDate,
-          time: formatedTime!);
-      //todo: userProvider
-      var userProvider = Provider.of<UserProvider>(context, listen: false);
-      //todo: eventProvider
-      FirebaseUtils.addEventToFireStore(event, userProvider.user!.id)
-          .then((value) {
-        ToastMsg.addToast(
-            message: "Event Added Successfully",
-            BGColor: AppColors.primaryLight,
-            textColor: AppColors.whiteColor);
-
-        eventProvider.getAllEvent(userProvider.user!.id);
-        Navigator.pop(
-          context,
-        );
-      }).timeout(const Duration(milliseconds: 500), onTimeout: () {
-        //todo:add alert dialog
-        ToastMsg.addToast(
-            message: "Event Added Successfully",
-            BGColor: AppColors.primaryLight,
-            textColor: AppColors.whiteColor);
-        print("event added successfully");
-        eventProvider.getAllEvent(userProvider.user!.id);
-        Navigator.pop(
-          context,
-        );
-      });
+  void addEvent() async {
+    if (selectedDate == null || formatedTime == null) {
+      ToastMsg.addToast(
+        message: "Please fill all required fields",
+        BGColor: Colors.orange,
+        textColor: Colors.white,
+      );
+      return;
     }
-    if (selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content:
-              Text(AppLocalizations.of(context)!.please_enter_event_time)));
+    if (formKey.currentState?.validate() == true) {
+      Event event = Event(
+        title: titleControler.text,
+        discription: descriptionController.text,
+        image: selectedImage,
+        eventName: selectedEventName,
+        dateTime: selectedDate,
+        time: formatedTime!,
+      );
+
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      var eventProvider = Provider.of<EventProvider>(context, listen: false);
+
+      try {
+        await FirebaseUtils.addEventToFireStore(event, userProvider.user!.id);
+        ToastMsg.addToast(
+          message: "Event Added Successfully",
+          BGColor: AppColors.primaryLight,
+          textColor: AppColors.whiteColor,
+        );
+        eventProvider.getAllEvent(userProvider.user!.id);
+        Navigator.pop(context);
+      } catch (e) {
+        ToastMsg.addToast(
+          message: "Failed to add event: $e",
+          BGColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
     }
   }
 

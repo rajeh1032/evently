@@ -1,3 +1,4 @@
+import 'package:evently/model/event.dart';
 import 'package:evently/providers/event_provider.dart';
 import 'package:evently/providers/user_provider.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_details.dart';
@@ -19,31 +20,22 @@ class FavouraiteTab extends StatefulWidget {
 
 class _FavouraiteTabState extends State<FavouraiteTab> {
   @override
-  // void initState() {
-  //   super.initState();
-  //   // Defer the loading to after the first frame
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     _loadFavorites();
-  //   });
-  // }
-  // ///to solve exception
-  // bool isLoading = true;
-  // Future<void> _loadFavorites() async {
-  //   if (!mounted) return;
+  void initState() {
+    super.initState();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final eventProvider = Provider.of<EventProvider>(context, listen: false);
 
-  //   final userProvider = Provider.of<UserProvider>(context, listen: false);
-  //   final eventListProvider =
-  //       Provider.of<EventProvider>(context, listen: false);
+    /// تأكد من تحميل بيانات المفضلة أولًا
+    if (eventProvider.favoriteEventList.isEmpty) {
+      setState(() {
+        filterFavoiriteEvent = eventProvider.favoriteEventList;
+      });
+    } else {
+      filterFavoiriteEvent = eventProvider.favoriteEventList;
+    }
+  }
 
-  //   if (userProvider.user != null) {
-  //     eventListProvider.getAllIsFavorite(userProvider.user!.id);
-  //   }
-
-  //   if (mounted) {
-  //     setState(() => isLoading = false);
-  //   }
-  // }
-
+  var filterFavoiriteEvent = [];
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -51,7 +43,6 @@ class _FavouraiteTabState extends State<FavouraiteTab> {
     var userProvider = Provider.of<UserProvider>(context);
     // eventListProvider.getAllEvent(userProvider.user!.id);
 
-    var eventListProvider = Provider.of<EventProvider>(context);
     // if (eventListProvider.favoriteEventList.isEmpty) {
     //   eventListProvider.getAllIsFavorite(userProvider.user!.id);
     // }
@@ -62,6 +53,7 @@ class _FavouraiteTabState extends State<FavouraiteTab> {
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+          //todo search event favorite
           child: CustomTextField(
             borderColor: AppColors.primaryLight,
             prefixIcon: ImageIcon(
@@ -70,13 +62,17 @@ class _FavouraiteTabState extends State<FavouraiteTab> {
             ),
             hintText: AppLocalizations.of(context)!.search_event,
             hintStyle: AppStyles.bold16Primary,
+            onChanged: (newText) {
+              searchedFavoriteEvent(newText);
+            },
           ),
         ),
         SizedBox(
           height: height * 0.02,
         ),
+        //todo show favorite event
         Expanded(
-          child: eventListProvider.filterList.isEmpty
+          child: filterFavoiriteEvent.isEmpty
               ? Center(
                   child: Text(
                     AppLocalizations.of(context)!.no_event_added,
@@ -90,15 +86,34 @@ class _FavouraiteTabState extends State<FavouraiteTab> {
                       height: height * 0.013,
                     );
                   },
-                  itemCount: eventListProvider.favoriteEventList.length,
+                  itemCount: filterFavoiriteEvent.length,
                   itemBuilder: (context, index) {
-                    return EventItem(
-                      event: eventListProvider.favoriteEventList[index],
+                    return InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          EventDetails.routeName,
+                          arguments: filterFavoiriteEvent[index],
+                        );
+                      },
+                      child: EventItem(
+                        event: filterFavoiriteEvent[index],
+                      ),
                     );
                   },
                 ),
         ),
       ],
     );
+  }
+
+  void searchedFavoriteEvent(String newText) {
+    var eventListProvider = Provider.of<EventProvider>(context, listen: false);
+    setState(() {
+      filterFavoiriteEvent = eventListProvider.favoriteEventList
+          .where((event) =>
+              event.title.toLowerCase().contains(newText.toLowerCase()))
+          .toList();
+    });
   }
 }

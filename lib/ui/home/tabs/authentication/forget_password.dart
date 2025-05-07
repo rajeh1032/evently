@@ -1,7 +1,10 @@
+import 'package:evently/ui/home/tabs/authentication/login_screen.dart';
 import 'package:evently/ui/widget/custom_elvated_button.dart';
 import 'package:evently/utils/app_asset.dart';
 import 'package:evently/utils/app_colors.dart';
 import 'package:evently/utils/app_styles.dart';
+import 'package:evently/utils/dailog_utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -10,10 +13,12 @@ class ForgetPassword extends StatelessWidget {
   ForgetPassword({super.key});
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  late var userEmail;
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    userEmail = ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -42,6 +47,7 @@ class ForgetPassword extends StatelessWidget {
                 backgroundColor: AppColors.primaryLight,
                 onPressed: () {
                   //todo: add reset password Acc function
+                  resetPassword(context);
                 },
                 text: AppLocalizations.of(context)!.reset_password,
               ),
@@ -53,5 +59,40 @@ class ForgetPassword extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> resetPassword(BuildContext context) async {
+    try {
+      DailogUtils.showLoading(
+          context: context, message: "Sending reset link...");
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: userEmail);
+      if (context.mounted) {
+        DailogUtils.hideLoading(context);
+        DailogUtils.showMessage(
+          context: context,
+          message: "Password reset link sent to your email",
+          title: "Success",
+          posActionName: "Back to Login",
+          posAction: () {
+            // Replace with pushNamedAndRemoveUntil to clear history
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              LoginScreen.routeName,
+              (route) => false, // This removes all previous routes
+            );
+          },
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        DailogUtils.hideLoading(context);
+        DailogUtils.showMessage(
+          context: context,
+          message: "An unexpected error occurred",
+          title: "Error",
+          posActionName: "OK",
+        );
+      }
+    }
   }
 }

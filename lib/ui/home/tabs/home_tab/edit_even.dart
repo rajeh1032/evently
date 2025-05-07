@@ -2,6 +2,7 @@ import 'package:evently/model/event.dart';
 import 'package:evently/providers/current_event.dart';
 import 'package:evently/providers/event_provider.dart';
 import 'package:evently/providers/user_provider.dart';
+import 'package:evently/ui/home/home_screen.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_date_or_time.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_item.dart';
 import 'package:evently/ui/home/tabs/home_tab/event_tab.dart';
@@ -11,6 +12,7 @@ import 'package:evently/ui/widget/custom_text_field.dart';
 import 'package:evently/utils/app_asset.dart';
 import 'package:evently/utils/app_colors.dart';
 import 'package:evently/utils/app_styles.dart';
+import 'package:evently/utils/toast_msg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -278,38 +280,52 @@ class _EditEventState extends State<EditEven> {
   }
 
   void updateEvent() async {
+    // if (selectedTime == null) {
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //       content:
+    //           Text(AppLocalizations.of(context)!.please_enter_event_time)));
+    // }
+    if (selectedDate == null || formatedTime == null) {
+      ToastMsg.addToast(
+        message: "Please fill all required fields",
+        BGColor: Colors.orange,
+        textColor: Colors.white,
+      );
+      return;
+    }
     if (formKey.currentState?.validate() == true) {
       //todo: update event
-      try {
-        var currentEventProvider =
-            Provider.of<CurrentEvent>(context, listen: false);
-        var event = currentEventProvider.currentEvent;
-        var userProvider = Provider.of<UserProvider>(context, listen: false);
-        var eventProvider = Provider.of<EventProvider>(context, listen: false);
-        Event upDateEvent = Event(
-            id: event!.id,
-            title: titleControler.text,
-            discription: descriptionControler.text,
-            image: eventImages[selected],
-            eventName: eventsList[selected]['name'],
-            dateTime: selectedDate,
-            time: formatedTime!,
-            isFavorite: event.isFavorite);
-        await eventProvider.updateEvent(upDateEvent, userProvider.user!.id);
+      var currentEventProvider =
+          Provider.of<CurrentEvent>(context, listen: false);
 
-        if (context.mounted) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Event Update Successfuly")));
-        }
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      var eventProvider = Provider.of<EventProvider>(context, listen: false);
+      Event upDateEvent = Event(
+          id: currentEventProvider.currentEvent!.id,
+          title: titleControler.text,
+          discription: descriptionControler.text,
+          image: eventImages[selected],
+          eventName: eventsList[selected]['name'],
+          dateTime: selectedDate,
+          time: formatedTime!,
+          isFavorite: currentEventProvider.currentEvent!.isFavorite);
+
+      try {
+        await eventProvider.updateEvent(upDateEvent, userProvider.user!.id);
+        ToastMsg.addToast(
+          message: "Event Uopdated Successfully",
+          BGColor: AppColors.primaryLight,
+          textColor: AppColors.whiteColor,
+        );
+        eventProvider.getAllEvent(userProvider.user!.id);
+        Navigator.pushNamed(context, HomeScreen.routeName);
       } catch (e) {
-        print("error is $e");
+        ToastMsg.addToast(
+          message: "Failed to update event: $e",
+          BGColor: Colors.red,
+          textColor: Colors.white,
+        );
       }
-    }
-    if (selectedTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content:
-              Text(AppLocalizations.of(context)!.please_enter_event_time)));
     }
   }
 

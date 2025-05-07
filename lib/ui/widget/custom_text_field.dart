@@ -18,6 +18,8 @@ class CustomTextField extends StatelessWidget {
   TextInputType keyboardType;
   bool obscureText;
   String? obscuringCharacter;
+  void Function(String)? onChanged;
+  
   
 
   CustomTextField(
@@ -33,11 +35,13 @@ class CustomTextField extends StatelessWidget {
       this.validator,
       this.keyboardType = TextInputType.text,
       this.obscureText = false,
-      this.obscuringCharacter});
+      this.obscuringCharacter,
+      this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      onChanged:onChanged ,
       keyboardType: keyboardType,
       obscureText: obscureText,
       obscuringCharacter: obscuringCharacter ?? "*",

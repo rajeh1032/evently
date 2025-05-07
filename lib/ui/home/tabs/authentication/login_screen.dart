@@ -133,9 +133,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    //todo: add forget password
                     TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, ForgetPassword.routeName);
+                        Navigator.pushNamed(context, ForgetPassword.routeName,
+                            arguments: emailController.text);
                       },
                       child: Text(
                         AppLocalizations.of(context)!.forgot_password,
